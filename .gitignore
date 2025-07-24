@@ -1,0 +1,30 @@
+# Java / Maven
+target/
+*.jar
+*.war
+*.ear
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# IDE files
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.sublime-workspace
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
