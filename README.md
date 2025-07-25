@@ -150,3 +150,122 @@ curl -X POST -H "Content-Type: application/json" -d "{\"name\":\"testuser\"}" ht
 
 # 사용자 조회
 curl http://localhost/api/users
+```
+
+## 5. Docker Desktop for Windows 환경에서 실행 중인 애플리케이션을 관리하는 핵심 kubectl 명령어들
+
+### 1. 애플리케이션 임시 중지 (파드 멈추기)
+설정은 그대로 둔 채, 실행 중인 파드(Pod)만 멈추고 싶을 때는 **복제본(replicas) 개수를 0으로 조절(scale down)**합니다.
+
+### 1.1. 특정 애플리케이션 멈추기
+```powershell
+# spring-app의 복제본을 0으로 만들어 파드를 모두 멈춤
+kubectl scale deployment spring-app --replicas=0
+
+# chat-app 멈추기
+kubectl scale deployment chat-app --replicas=0
+
+# php-app 멈추기
+kubectl scale deployment php-app --replicas=0
+
+# Oracle DB 멈추기 (StatefulSet은 명령어가 다름)
+kubectl scale statefulset oracle-db --replicas=0
+
+# Ingress Controller 멈추기
+kubectl scale deployment ingress-nginx-controller --replicas=0 -n ingress-nginx
+```
+
+### 1.2. 모든 애플리케이션 한번에 멈추기
+```powershell
+# 모든 Deployment의 복제본을 0으로 설정
+kubectl scale deployment --all --replicas=0
+
+# 모든 StatefulSet의 복제본을 0으로 설정
+kubectl scale statefulset --all --replicas=0
+
+# 'ingress-nginx' 네임스페이스의 Ingress Controller(정문) 멈추기
+kubectl scale deployment --all --replicas=0 -n ingress-nginx
+```
+
+### 2. 임시 중지한 애플리케이션 다시 시작하기
+복제본 개수를 원래대로 되돌려 **다시 파드를 실행(scale up)**합니다.
+
+### 2.1. 특정 애플리케이션 다시 시작하기
+```powershell
+# spring-app의 복제본을 2개로 다시 늘림
+kubectl scale deployment spring-app --replicas=2
+
+# chat-app의 복제본을 2개로 다시 늘림
+kubectl scale deployment chat-app --replicas=2
+
+# php-app의 복제본을 1개로 다시 늘림
+kubectl scale deployment php-app --replicas=1
+
+# MySQL 다시 시작
+kubectl scale statefulset mysql --replicas=1
+
+# Oracle DB 다시 시작
+kubectl scale statefulset oracle-db --replicas=1
+
+# Ingress Controller 다시 시작하기
+kubectl scale deployment ingress-nginx-controller --replicas=1 -n ingress-nginx
+```
+
+### 3. 애플리케이션 완전 삭제 (리소스 제거)
+파드뿐만 아니라 Deployment, Service 등 관련된 모든 설정을 클러스터에서 완전히 제거합니다.
+
+### 3.1. YAML 파일 기준으로 삭제 (가장 권장되는 방법)
+각 YAML 파일에 정의된 모든 리소스를 한번에 삭제합니다.
+
+```powershell
+# k8s 디렉토리로 이동
+cd k8s
+
+# 각 파일별로 삭제
+kubectl delete -f spring-app-deployment.yaml
+kubectl delete -f chat-app-deployment.yaml
+kubectl delete -f php-app-deployment.yaml
+kubectl delete -f oracle-deployment.yaml
+kubectl delete -f mysql-deployment.yaml
+kubectl delete -f ingress.yaml
+kubectl delete -f oracle-secret.yaml
+kubectl delete -f mysql-secret.yaml
+```
+
+### 3.2. 폴더 전체 한번에 삭제
+```powershell
+# k8s 디렉토리로 이동
+cd k8s
+
+# 폴더 내 모든 yaml 파일 적용하여 삭제
+kubectl delete -f .
+
+```
+
+### 4. 삭제 후 다시 배포하기
+완전히 삭제한 후 처음부터 다시 배포하는 방법입니다.
+
+```powershell
+# k8s 디렉토리로 이동
+cd k8s
+
+# Secret 먼저 배포
+kubectl apply -f mysql-secret.yaml
+kubectl apply -f oracle-secret.yaml
+
+# 나머지 리소스 배포 (폴더 전체 적용)
+kubectl apply -f .
+
+```
+
+### 5. 쿠버네티스 클러스터 자체를 끄고 켜기 (XAMPP 사용 시 최적)
+가장 간단한 방법입니다. Docker Desktop의 쿠버네티스 클러스터 자체를 잠시 멈추면 포트 80을 포함한 모든 리소스 사용이 중단됩니다.
+
+**끄는 법**
+1. Windows 작업 표시줄 트레이에서 Docker Desktop 아이콘을 우클릭합니다.
+2. 메뉴에서 Kubernetes 항목 위에 마우스를 올립니다.
+3. Running 상태 옆의 일시정지(Pause) 아이콘을 클릭합니다.
+
+**켜는 법**
+1. 마찬가지로 Docker Desktop 아이콘 우클릭 > Kubernetes 메뉴로 이동합니다.
+2. Paused 상태 옆의 재생(Resume) 아이콘을 클릭합니다. 이전에 실행 중이던 모든 파드와 설정이 그대로 다시 살아납니다.
