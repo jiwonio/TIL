@@ -16,34 +16,30 @@
     <div class="container">
         <h1>Oracle DB 연결 테스트</h1>
         <?php
-        // Kubernetes 환경 변수에서 비밀번호를 가져옵니다.
+        // 환경 변수에서 DB 접속 정보 가져오기
         $db_password = getenv('ORACLE_PASSWORD');
+        // docker-compose에서는 'oracle-dev', k8s에서는 'oracle-db-service'
+        $db_host = getenv('ORACLE_HOST') ?: 'oracle-db-service';
 
-        // Oracle DB 접속 정보
-        $db_host = 'oracle-db-service'; // Kubernetes 서비스 이름
         $db_port = 1521;
-        $db_service_name = 'FREEPDB1'; // Oracle Free 이미지의 기본 서비스 이름
+        $db_service_name = 'FREEPDB1';
         $db_user = 'system';
 
-        // DSN (Data Source Name) 문자열 생성
         $dsn = "oci:dbname=//{$db_host}:{$db_port}/{$db_service_name};charset=AL32UTF8";
 
         try {
-            // PDO 객체 생성 및 DB 연결
             $pdo = new PDO($dsn, $db_user, $db_password);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            echo '<div class="status success">성공: Oracle 데이터베이스에 성공적으로 연결되었습니다.</div>';
+            echo '<div class="status success">성공: Oracle 데이터베이스에 성공적으로 연결되었습니다. (Host: ' . htmlspecialchars($db_host) . ')</div>';
 
-            // 간단한 쿼리 실행
             $stmt = $pdo->query("SELECT 'Oracle DB 응답: ' || dummy AS response FROM DUAL");
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             echo '<p><strong>쿼리 결과:</strong> ' . htmlspecialchars($result['RESPONSE']) . '</p>';
 
         } catch (PDOException $e) {
-            // 에러 메시지 출력
-            echo '<div class="status error">실패: 데이터베이스 연결에 실패했습니다.</div>';
+            echo '<div class="status error">실패: 데이터베이스 연결에 실패했습니다. (Host: ' . htmlspecialchars($db_host) . ')</div>';
             echo '<p><strong>에러 내용:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
         }
         ?>
