@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>회원가입 - TIL</title>
+  <style>
+    :root{color-scheme:light dark}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f6f7f9}
+    .container{max-width:560px;margin:5vh auto;padding:24px;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    h1{margin:0 0 16px;font-size:22px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{margin:12px 0}
+    label{display:block;margin-bottom:6px;color:#555;font-size:14px}
+    input[type="email"],input[type="password"],input[type="text"],input[type="file"]{width:100%;padding:12px 14px;border:1px solid #e3e6eb;border-radius:10px;font-size:14px}
+    .btn{display:inline-block;padding:12px 18px;background:#1f6feb;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+    .row{display:flex;gap:10px;align-items:center}
+    .alert{padding:10px 12px;border-radius:10px;font-size:14px;margin:10px 0}
+    .alert-error{background:#ffeef0;color:#8a1225;border:1px solid #ffd5da}
+    .errors{color:#8a1225;font-size:12px;margin-top:6px}
+    a{color:#1f6feb;text-decoration:none}
+  </style>
+</head>
+<body>
+<main class="container">
+  <h1>회원가입</h1>
+  <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+  <form th:action="@{/auth/register}" th:object="${registrationRequest}" method="post" enctype="multipart/form-data">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <div class="field">
+      <label for="email">이메일</label>
+      <input id="email" type="email" th:field="*{email}" placeholder="you@example.com" required />
+      <div class="errors" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="password">비밀번호</label>
+        <input id="password" type="password" th:field="*{password}" placeholder="최소 8자, 영문+숫자 포함" required />
+        <div class="errors" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+      </div>
+      <div class="field">
+        <label for="nickname">닉네임</label>
+        <input id="nickname" type="text" th:field="*{nickname}" placeholder="닉네임" required />
+        <div class="errors" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="profileImage">프로필 이미지 (선택)</label>
+      <input id="profileImage" type="file" th:field="*{profileImage}" accept="image/*" />
+    </div>
+
+    <div class="row">
+      <button type="submit" class="btn">가입하기</button>
+      <span>이미 계정이 있으신가요? <a th:href="@{/login}">로그인</a></span>
+    </div>
+  </form>
+</main>
+</body>
+</html>
