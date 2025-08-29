@@ -31,6 +31,7 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PostType type = PostType.NORMAL;

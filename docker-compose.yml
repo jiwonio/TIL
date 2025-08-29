@@ -1,0 +1,9 @@
+services:
+  til-app:
+    image: til-app:latest
+    container_name: til-app-container
+    build: . # 로컬에서 Docker 이미지를 빌드하도록 지시
+    ports:
+      - "8088:8088"
+    env_file:
+      - ./.env # .env 파일의 환경 변수 로드
